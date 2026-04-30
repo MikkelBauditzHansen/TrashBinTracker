@@ -4,9 +4,15 @@ namespace TrashBinTracker.Repo
 {
     public interface INotificationrepo
     {
-        Notification GetAll();
+        List<Notification> GetAll();
 
+        Notification Add(int notficationID);
 
+        Notification Get(int notficationID);
+
+        void Delete(int notficationID);
+
+        void Update(int notficationID);
 
     }
 }
