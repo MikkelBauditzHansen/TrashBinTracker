@@ -1,4 +1,5 @@
 using TrashBinTracker.Repo;
+
 namespace TrashBinTracker
 {
     public class Program
@@ -8,12 +9,28 @@ namespace TrashBinTracker
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+            {
+                     options.JsonSerializerOptions.Converters.Add(
+                     new System.Text.Json.Serialization.JsonStringEnumConverter());
+             });
             builder.Services.AddOpenApi();
             builder.Services.AddSwaggerGen();
             builder.Services.AddSingleton<ITrashRepository, TrashRepositoryList>();
+
+            // ? TILFØJ CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend",
+                    policy =>
+                    {
+                        policy.WithOrigins("http://127.0.0.1:5500")
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
+                    });
+            });
 
             var app = builder.Build();
 
@@ -27,8 +44,11 @@ namespace TrashBinTracker
 
             app.UseSwagger();
             app.UseSwaggerUI();
-            app.UseAuthorization();
 
+            // ? AKTIVÉR CORS (skal være før Authorization!)
+            app.UseCors("AllowFrontend");
+
+            app.UseAuthorization();
 
             app.MapControllers();
 

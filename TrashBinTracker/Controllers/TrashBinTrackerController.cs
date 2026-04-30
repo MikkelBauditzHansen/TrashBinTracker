@@ -14,7 +14,7 @@ namespace TrashBinTracker.Controllers
             _trashRepository = trashRepository;
         }
         [HttpPost]
-        public ActionResult<TrashBin> AddTrashBin(TrashBin trashBin)
+        public ActionResult<TrashBin> AddTrashBin([FromBody] TrashBin trashBin)
         {
             if (trashBin == null)
             {
