@@ -1,4 +1,4 @@
-
+using TrashBinTracker.Repo;
 namespace TrashBinTracker
 {
     public class Program
@@ -12,6 +12,8 @@ namespace TrashBinTracker
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+            builder.Services.AddSwaggerGen();
+            builder.Services.AddSingleton<ITrashRepository, TrashRepositoryList>();
 
             var app = builder.Build();
 
@@ -23,6 +25,8 @@ namespace TrashBinTracker
 
             app.UseHttpsRedirection();
 
+            app.UseSwagger();
+            app.UseSwaggerUI();
             app.UseAuthorization();
 
 

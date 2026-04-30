@@ -1,0 +1,25 @@
+﻿namespace TrashBinTracker.Model
+{
+    public enum WasteType
+    {
+        General,
+        Paper,
+        Organic,
+        Metal
+    }
+    public class TrashBin
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? Location { get; set; }
+        public WasteType WasteType { get; set; }
+
+        public TrashBin()
+        {
+            Name = "";
+            Location = "";
+            WasteType = WasteType.General;
+        }
+    }
+
+}
