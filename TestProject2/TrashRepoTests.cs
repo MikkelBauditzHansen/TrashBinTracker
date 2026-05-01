@@ -10,7 +10,7 @@ namespace TrashBinTrackerTests
         public void Add_AssignsIdAndReturnsSameInstance()
         {
             var repo = new TrashRepositoryList();
-            var bin = new TrashBin { Name = "Bin A", Location = "Lobby", WasteType = WasteType.Paper };
+            var bin = new TrashBin { Name = "Bin A", Location = "Lobby", WasteType = WasteType.Paper, FillLevel = 20};
 
             var result = repo.Add(bin);
 
@@ -42,7 +42,8 @@ namespace TrashBinTrackerTests
             {
                 Name = "Recycling",
                 Location = "Kitchen",
-                WasteType = WasteType.Metal
+                WasteType = WasteType.Metal,
+                FillLevel = 50
             };
 
             var added = repo.Add(bin);
@@ -50,6 +51,7 @@ namespace TrashBinTrackerTests
             Assert.Equal("Recycling", added.Name);
             Assert.Equal("Kitchen", added.Location);
             Assert.Equal(WasteType.Metal, added.WasteType);
+            Assert.Equal(50, added.FillLevel);
         }
     }
 }

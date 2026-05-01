@@ -13,12 +13,14 @@
         public string? Name { get; set; }
         public string? Location { get; set; }
         public WasteType WasteType { get; set; }
+        public int FillLevel { get; set; }
 
         public TrashBin()
         {
             Name = "";
             Location = "";
             WasteType = WasteType.General;
+            FillLevel = 0;
         }
     }
 
