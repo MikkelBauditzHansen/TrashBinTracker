@@ -6,6 +6,8 @@ namespace TrashBinTracker.Repo
     {
         TrashBin Add(TrashBin trashBin);
         IEnumerable<TrashBin> GetAll();
-
+        TrashBin? Update(int id, TrashBin updatedTrashBin);
+        TrashBin? Delete(int id);
+        TrashBin? GetById(int id);
     }
 }

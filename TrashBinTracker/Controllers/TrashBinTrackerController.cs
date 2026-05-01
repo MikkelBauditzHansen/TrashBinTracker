@@ -37,5 +37,36 @@ namespace TrashBinTracker.Controllers
             }
             return Ok(trashBins);
         }
+        [HttpGet("{id}")]
+        public ActionResult<TrashBin> GetTrashBinById(int id)
+        {
+            TrashBin? trashBin = _trashRepository.GetById(id);
+            if (trashBin == null)
+            {
+                return NotFound();
+            }
+            return Ok(trashBin);
+        }
+        [HttpPut("{id}")]
+        public ActionResult<TrashBin> UpdateTrashBin(int id, [FromBody] TrashBin trashBin)
+        {
+            TrashBin? updatedTrashBin = _trashRepository.Update(id, trashBin);
+            if (updatedTrashBin == null)
+            {
+                return NotFound();
+            }
+            return Ok(updatedTrashBin);
+        }
+        [HttpDelete("{id}")]
+        public ActionResult<TrashBin> DeleteTrashBin(int id)
+        {
+            TrashBin? deletedTrashBin = _trashRepository.Delete(id);
+            if (deletedTrashBin == null)
+            {
+                return NotFound();
+            }
+            return Ok(deletedTrashBin);
+
+        }
     }
 }

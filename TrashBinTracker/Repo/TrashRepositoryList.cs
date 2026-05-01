@@ -20,5 +20,32 @@ namespace TrashBinTracker.Repo
         {
             return _trashBins;
         }
+        public TrashBin? Update(int id, TrashBin updatedTrashBin)
+        {
+            TrashBin? existing = _trashBins.FirstOrDefault(tb => tb.Id == id);
+            if (existing == null)
+            {
+                return null;
+            }
+            existing.Name = updatedTrashBin.Name;
+            existing.Location = updatedTrashBin.Location;
+            existing.WasteType = updatedTrashBin.WasteType;
+            existing.FillLevel = updatedTrashBin.FillLevel;
+            return existing;
+        }
+        public TrashBin? Delete(int id)
+        {
+            TrashBin? trashBin = GetById(id);
+            if (trashBin == null)
+            {
+                return null;
+            }
+            _trashBins.Remove(trashBin);
+            return trashBin;
+        }
+        public TrashBin? GetById(int id)
+        {
+            return _trashBins.FirstOrDefault(b => b.Id == id);
+        }
     }
 }
