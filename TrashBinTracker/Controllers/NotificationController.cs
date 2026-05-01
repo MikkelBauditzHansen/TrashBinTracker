@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TrashBinTracker.Model;
+using TrashBinTracker.Repo;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,36 +10,47 @@ namespace TrashBinTracker.Controllers
     [ApiController]
     public class NotificationController : ControllerBase
     {
+        NotificationRepo _repo;
+        public NotificationController(NotificationRepo repo)
+        {
+            _repo = repo;
+        }
+
         // GET: api/<NotificationController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public ActionResult<IEnumerable<Notification>>Get()
         {
-            return new string[] { "value1", "value2" };
+            return Ok(_repo.GetAll());
         }
 
         // GET api/<NotificationController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public ActionResult<Notification>Get(int id)
         {
-            return "value";
+            return Ok(_repo.Get(id));
         }
 
         // POST api/<NotificationController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public ActionResult<Notification> Post([FromBody] Notification value)
         {
+            return Ok(_repo.Add(value.TrashLevel,value.TrashCanID,value.NotificationId));
         }
 
         // PUT api/<NotificationController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public ActionResult<Notification> Put(int id, [FromBody] Notification value)
         {
+            return Ok(_repo.Update(value.TrashLevel, value.TrashCanID, id));
+
         }
 
         // DELETE api/<NotificationController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public ActionResult<Notification> Delete(int id)
         {
+
+            return Ok(_repo.Delete(id));
         }
     }
 }

@@ -10,6 +10,12 @@
 
         public int NotificationId { set; get; }
 
-
+        public Notification(int trashLevel, int trashCanID, int notaficationId)
+        {
+            TrashLevel = trashLevel;
+            TrashCanID = trashCanID;
+            NotificationId = notaficationId;
+            NotificationMessage = $"Youre trashlevel is {trashLevel}";
+        }
     }
 }

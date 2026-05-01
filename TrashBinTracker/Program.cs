@@ -1,4 +1,6 @@
 
+using TrashBinTracker.Repo;
+
 namespace TrashBinTracker
 {
     public class Program
@@ -12,6 +14,7 @@ namespace TrashBinTracker
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+            builder.Services.AddSingleton<NotificationRepo>(new NotificationRepo());
 
             var app = builder.Build();
 

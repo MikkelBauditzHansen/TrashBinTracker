@@ -1,4 +1,5 @@
-﻿using TrashBinTracker.Model;
+﻿using System.Diagnostics;
+using TrashBinTracker.Model;
 
 namespace TrashBinTracker.Repo
 {
@@ -8,30 +9,41 @@ namespace TrashBinTracker.Repo
         public NotificationRepo()
         {
             notifications = new List<Notification>();
+            notifications.Add(new Notification(1, 2, 0));
+            notifications.Add(new Notification(1, 2, 1));
+            notifications.Add(new Notification(1, 2, 2));
         }
-        public Notification Add(int notficationID)
+        public Notification Add(int trashLevel, int trashCanID, int notaficationId)
         {
-            throw new NotImplementedException();
+            Notification notification = new Notification( trashLevel,trashCanID, notaficationId);
+            notifications.Add(notification);
+            return notification;
         }
 
-        public void Delete(int notficationID)
+        public Notification Delete(int notficationID)
         {
-            throw new NotImplementedException();
+            Notification notification = notifications[notficationID];
+            notifications.RemoveAt(notficationID);
+            return notification;
+
         }
 
         public Notification Get(int notficationID)
         {
-            throw new NotImplementedException();
+            return notifications[notficationID];
         }
 
         public List<Notification> GetAll()
         {
-            throw new NotImplementedException();
+            return notifications;
         }
 
-        public void Update(int notficationID)
+        public Notification Update(int trashLevel, int trashCanID, int notaficationId)
         {
-            throw new NotImplementedException();
+            Notification notification = new Notification(trashLevel, trashCanID, notaficationId);
+            notifications[notaficationId] = notification;
+            return notification;
+
         }
     }
 }

@@ -6,13 +6,14 @@ namespace TrashBinTracker.Repo
     {
         List<Notification> GetAll();
 
-        Notification Add(int notficationID);
+        Notification Add(int trashLevel, int trashCanID, int notaficationId);
 
         Notification Get(int notficationID);
 
-        void Delete(int notficationID);
+        Notification Delete(int notficationID);
 
-        void Update(int notficationID);
+        Notification Update(int trashLevel, int trashCanID, int notaficationId);
 
     }
+
 }
