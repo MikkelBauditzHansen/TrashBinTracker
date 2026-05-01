@@ -27,5 +27,15 @@ namespace TrashBinTracker.Controllers
             }
             return CreatedAtAction(nameof(AddTrashBin), new { id = addedTrashbin.Id }, addedTrashbin);
         }
+        [HttpGet]
+        public ActionResult<IEnumerable<TrashBin>> GetAllTrashBins()
+        {
+            var trashBins = _trashRepository.GetAll();
+            if (trashBins == null || trashBins.Count() == 0)
+            {
+                return Ok(new List<TrashBin>());
+            }
+            return Ok(trashBins);
+        }
     }
 }

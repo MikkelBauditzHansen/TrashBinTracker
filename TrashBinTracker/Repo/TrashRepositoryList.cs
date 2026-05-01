@@ -16,5 +16,9 @@ namespace TrashBinTracker.Repo
             _trashBins.Add(trashBin);
             return trashBin;
         }
+        public IEnumerable<TrashBin> GetAll()
+        {
+            return _trashBins;
+        }
     }
 }

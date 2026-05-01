@@ -5,5 +5,7 @@ namespace TrashBinTracker.Repo
     public interface ITrashRepository
     {
         TrashBin Add(TrashBin trashBin);
+        IEnumerable<TrashBin> GetAll();
+
     }
 }

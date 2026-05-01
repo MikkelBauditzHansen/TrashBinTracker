@@ -53,5 +53,64 @@ namespace TrashBinTrackerTests
             Assert.Equal(WasteType.Metal, added.WasteType);
             Assert.Equal(50, added.FillLevel);
         }
+        [Fact]
+        public void Add_ShouldAssignId_WhenTrashBinIsAdded()
+        {
+            // Arrange
+            ITrashRepository repo = new TrashRepositoryList();
+
+            TrashBin bin = new TrashBin
+            {
+                Name = "Test",
+                WasteType = WasteType.General,
+                Location = "Kantine",
+                FillLevel = 0
+            };
+
+            // Act
+            TrashBin result = repo.Add(bin);
+
+            // Assert
+            Assert.Equal(1, result.Id);
+        }
+
+        [Fact]
+        public void Add_ShouldStoreTrashBin_InRepository()
+        {
+            // Arrange
+            ITrashRepository repo = new TrashRepositoryList();
+
+            TrashBin bin = new TrashBin
+            {
+                Name = "Papir",
+                WasteType = WasteType.Paper,
+                Location = "Lokale A",
+                FillLevel = 20
+            };
+
+            // Act
+            repo.Add(bin);
+            IEnumerable<TrashBin> all = repo.GetAll();
+
+            // Assert
+            Assert.Single(all);
+        }
+
+        [Fact]
+        public void GetAll_ShouldReturnAllTrashBins()
+        {
+            // Arrange
+            ITrashRepository repo = new TrashRepositoryList();
+
+            repo.Add(new TrashBin { Name = "A", WasteType = WasteType.General, Location = "X" });
+            repo.Add(new TrashBin { Name = "B", WasteType = WasteType.Metal, Location = "Y" });
+
+            // Act
+            IEnumerable<TrashBin> result = repo.GetAll();
+
+            // Assert
+            Assert.Equal(2, result.Count());
+        }
+
     }
 }
