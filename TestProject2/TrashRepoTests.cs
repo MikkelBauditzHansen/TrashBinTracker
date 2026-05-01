@@ -73,7 +73,7 @@ namespace TrashBinTrackerTests
             // Assert
             Assert.Equal(1, result.Id);
         }
-
+        // getall + add
         [Fact]
         public void Add_ShouldStoreTrashBin_InRepository()
         {
@@ -95,7 +95,7 @@ namespace TrashBinTrackerTests
             // Assert
             Assert.Single(all);
         }
-
+        //getall
         [Fact]
         public void GetAll_ShouldReturnAllTrashBins()
         {
