@@ -20,8 +20,20 @@ namespace TrashBinTracker.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Notification>>Get()
         {
-            return Ok(_repo.GetAll());
+            List<Notification> list = _repo.GetAll();
+            if (list != null)
+            {
+
+
+                return Ok(list);
+
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
+        
 
         // GET api/<NotificationController>/5
         [HttpGet("{id}")]

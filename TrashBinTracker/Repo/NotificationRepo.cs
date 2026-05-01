@@ -12,6 +12,8 @@ namespace TrashBinTracker.Repo
             notifications.Add(new Notification(1, 2, 0));
             notifications.Add(new Notification(1, 2, 1));
             notifications.Add(new Notification(1, 2, 2));
+            notifications.Add(new Notification(1, 2, 3));
+
         }
         public Notification Add(int trashLevel, int trashCanID, int notaficationId)
         {

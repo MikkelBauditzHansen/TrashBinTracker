@@ -10,7 +10,14 @@ namespace TrashBinTracker
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: "AllowAll",
+                                          policy =>
+                                          {
+                                              policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                                          });
+            });
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
@@ -23,7 +30,7 @@ namespace TrashBinTracker
             {
                 app.MapOpenApi();
             }
-
+            app.UseCors("AllowAll");
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
