@@ -1,5 +1,7 @@
 using TrashBinTracker.Repo;
 
+using TrashBinTracker.Repo;
+
 namespace TrashBinTracker
 {
     public class Program
@@ -9,6 +11,14 @@ namespace TrashBinTracker
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: "AllowAll",
+                                          policy =>
+                                          {
+                                              policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                                          });
+            });
             builder.Services.AddControllers();
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
@@ -17,11 +27,12 @@ namespace TrashBinTracker
                      new System.Text.Json.Serialization.JsonStringEnumConverter());
              });
             builder.Services.AddOpenApi();
+            builder.Services.AddSingleton<NotificationRepo>(new NotificationRepo());
             builder.Services.AddSwaggerGen();
             builder.Services.AddSingleton<ITrashRepository, TrashRepositoryList>();
             builder.Services.AddSingleton<ILocationRepository, LocationRepositoryList>();
 
-            // ? TILFØJ CORS
+            // ? TILFÃ˜J CORS
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend",
@@ -40,13 +51,13 @@ namespace TrashBinTracker
             {
                 app.MapOpenApi();
             }
-
+            app.UseCors("AllowAll");
             app.UseHttpsRedirection();
 
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            // ? AKTIVÉR CORS (skal være før Authorization!)
+            // ? AKTIVÃ‰R CORS (skal vÃ¦re fÃ¸r Authorization!)
             app.UseCors("AllowFrontend");
 
             app.UseAuthorization();
