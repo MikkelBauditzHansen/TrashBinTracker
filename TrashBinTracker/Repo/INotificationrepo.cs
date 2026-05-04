@@ -2,18 +2,12 @@
 
 namespace TrashBinTracker.Repo
 {
-    public interface INotificationrepo
+    public interface INotificationRepo
     {
+        Notification Add(int trashLevel, int trashCanID);
+        Notification Delete(int id);
+        Notification Get(int id);
         List<Notification> GetAll();
-
-        Notification Add(int trashLevel, int trashCanID, int notaficationId);
-
-        Notification Get(int notficationID);
-
-        Notification Delete(int notficationID);
-
-        Notification Update(int trashLevel, int trashCanID, int notaficationId);
-
+        Notification Update(int trashLevel, int trashBinId, int id);
     }
-
 }

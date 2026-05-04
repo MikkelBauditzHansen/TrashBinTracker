@@ -3,49 +3,53 @@ using TrashBinTracker.Model;
 
 namespace TrashBinTracker.Repo
 {
-    public class NotificationRepo : INotificationrepo
+    public class NotificationRepo : INotificationRepo
     {
-        List<Notification> notifications;
-        public NotificationRepo()
-        {
-            notifications = new List<Notification>();
-            notifications.Add(new Notification(1, 2, 0));
-            notifications.Add(new Notification(1, 2, 1));
-            notifications.Add(new Notification(1, 2, 2));
-            notifications.Add(new Notification(1, 2, 3));
+        private readonly List<Notification> _notifications = new();
+        private int _nextId = 1;
 
-        }
-        public Notification Add(int trashLevel, int trashCanID, int notaficationId)
+        public Notification Add(int trashLevel, int trashCanID)
         {
-            Notification notification = new Notification( trashLevel,trashCanID, notaficationId);
-            notifications.Add(notification);
+            Notification notification = new Notification(trashLevel, trashCanID, _nextId++);
+            _notifications.Add(notification);
             return notification;
         }
 
-        public Notification Delete(int notficationID)
+        public Notification Delete(int id)
         {
-            Notification notification = notifications[notficationID];
-            notifications.RemoveAt(notficationID);
-            return notification;
+            var notif = Get(id);
+            if (notif == null)
+            {
+                return null;
+            }
 
+            _notifications.Remove(notif);
+            return notif;
         }
 
-        public Notification Get(int notficationID)
+        public Notification Get(int id)
         {
-            return notifications[notficationID];
+            return _notifications.FirstOrDefault(n => n.NotificationId == id);
         }
 
         public List<Notification> GetAll()
         {
-            return notifications;
+            return _notifications;
         }
 
-        public Notification Update(int trashLevel, int trashCanID, int notaficationId)
+        public Notification Update(int trashLevel, int trashBinId, int id)
         {
-            Notification notification = new Notification(trashLevel, trashCanID, notaficationId);
-            notifications[notaficationId] = notification;
-            return notification;
+            var notif = Get(id);
+            if (notif == null)
+            {
+                return null;
+            }
 
+            notif.TrashLevel = trashLevel;
+            notif.TrashCanID = trashBinId;
+            notif.NotificationMessage = $"Your trash level is {trashLevel}%";
+
+            return notif;
         }
     }
 }
