@@ -22,13 +22,13 @@ namespace TrashBinTracker.Repo
         }
         public TrashBin? Update(int id, TrashBin updatedTrashBin)
         {
-            TrashBin? existing = _trashBins.FirstOrDefault(tb => tb.Id == id);
+            TrashBin? existing = GetById(id);
             if (existing == null)
             {
                 return null;
             }
             existing.Name = updatedTrashBin.Name;
-            existing.Location = updatedTrashBin.Location;
+            existing.LocationID = updatedTrashBin.LocationID;
             existing.WasteType = updatedTrashBin.WasteType;
             existing.FillLevel = updatedTrashBin.FillLevel;
             return existing;

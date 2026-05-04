@@ -19,6 +19,7 @@ namespace TrashBinTracker
             builder.Services.AddOpenApi();
             builder.Services.AddSwaggerGen();
             builder.Services.AddSingleton<ITrashRepository, TrashRepositoryList>();
+            builder.Services.AddSingleton<ILocationRepository, LocationRepositoryList>();
 
             // ? TILFØJ CORS
             builder.Services.AddCors(options =>
