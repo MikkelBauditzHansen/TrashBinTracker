@@ -28,7 +28,7 @@ namespace TrashBinTracker.Repo
                 return null;
             }
             existing.Name = updatedTrashBin.Name;
-            existing.LocationID = updatedTrashBin.LocationID;
+            existing.LocationId = updatedTrashBin.LocationId;
             existing.WasteType = updatedTrashBin.WasteType;
             existing.FillLevel = updatedTrashBin.FillLevel;
             return existing;

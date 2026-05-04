@@ -54,7 +54,7 @@ namespace TrashBinTracker.Controllers
         [HttpDelete("{id}")]
         public ActionResult<Location> Delete(int id)
         {
-            bool inUse = _trashRepo.GetAll().Any(b => b.LocationID == id);
+            bool inUse = _trashRepo.GetAll().Any(b => b.LocationId == id);
             if (inUse)
             {
                 return BadRequest("Location is in use");
