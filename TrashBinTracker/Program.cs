@@ -1,6 +1,8 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using TrashBinTracker.Repo;
 
-using TrashBinTracker.Repo;
 
 namespace TrashBinTracker
 {
@@ -44,6 +46,37 @@ namespace TrashBinTracker
                     });
             });
 
+
+
+            //JWT Authentication
+
+            var jwtSettings = builder.Configuration.GetSection("Jwt");
+            var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]!);
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+                    ValidAudience = jwtSettings["Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                };
+            });
+
+            builder.Services.AddAuthorization();
+
+
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -60,7 +93,12 @@ namespace TrashBinTracker
             // ? AKTIVÉR CORS (skal være før Authorization!)
             app.UseCors("AllowFrontend");
 
-            app.UseAuthorization();
+
+            // ? Aktiver JWT-AUTHENTICATION
+            app.UseAuthentication(); // Checks "Who are you?"
+            app.UseAuthorization();  // Checks "Are you allowed to be here?"
+
+
 
             app.MapControllers();
 

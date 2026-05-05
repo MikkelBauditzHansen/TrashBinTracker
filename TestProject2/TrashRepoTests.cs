@@ -1,6 +1,7 @@
 ﻿using Xunit;
 using TrashBinTracker.Model;
 using TrashBinTracker.Repo;
+using TrashBinTracker.Controllers;
 
 namespace TrashBinTrackerTests
 {

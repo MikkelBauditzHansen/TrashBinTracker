@@ -7,6 +7,7 @@ using Xunit;
 using TrashBinTracker.Model;
 using TrashBinTracker.Repo;
 using TrashBinTracker.Service;
+using TrashBinTracker.Controllers;
 
 namespace NootficaionTest
 {
@@ -23,7 +24,7 @@ namespace NootficaionTest
            NotificationRepo repo = new NotificationRepo();
 
 
-           Notification notification =  repo.Add(2,2,newID);
+           Notification notification =  repo.Add(2,2);
 
 
            Assert.Equal(notification.NotificationId,newID);
