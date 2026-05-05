@@ -9,5 +9,6 @@ namespace TrashBinTracker.Repo
         TrashBin? Update(int id, TrashBin updatedTrashBin);
         TrashBin? Delete(int id);
         TrashBin? GetById(int id);
+        TrashBin? EmptyTrash(int id);
     }
 }

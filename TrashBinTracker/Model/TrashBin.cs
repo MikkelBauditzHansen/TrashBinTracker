@@ -16,14 +16,16 @@ namespace TrashBinTracker.Model
         public int LocationId { get; set; }
         public WasteType WasteType { get; set; }
         public int FillLevel { get; set; }
-        public DateAndTime LastEmptied { get; set; }
-        public List<>
+        public DateTime LastEmptied { get; set; }
+        public List<EmptyHistory> EmptyHistory { get; set; }
 
         public TrashBin()
         {
             Name = "";
             WasteType = WasteType.General;
             FillLevel = 0;
+            LastEmptied = DateTime.Now;
+            EmptyHistory = new List<EmptyHistory>();
         }
     }
 

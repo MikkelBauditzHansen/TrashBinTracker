@@ -84,5 +84,15 @@ namespace TrashBinTracker.Controllers
             return Ok(deletedTrashBin);
 
         }
+        [HttpPut("{id}/empty")]
+        public ActionResult<TrashBin> EmptyTrashBin(int id)
+        {
+            TrashBin? emptiedTrashBin = _trashRepository.EmptyTrash(id);
+            if (emptiedTrashBin == null)
+            {
+                return NotFound();
+            }
+            return Ok(emptiedTrashBin);
+        }
     }
 }

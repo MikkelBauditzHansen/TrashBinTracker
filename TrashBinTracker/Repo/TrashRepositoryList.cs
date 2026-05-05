@@ -58,5 +58,24 @@ namespace TrashBinTracker.Repo
         {
             return _trashBins.FirstOrDefault(b => b.Id == id);
         }
+        public TrashBin? EmptyTrash(int id)
+        {
+                TrashBin? trashBin = GetById(id);
+                if (trashBin == null)
+                {
+                    return null;
+                }
+                trashBin.FillLevel = 0;
+                trashBin.LastEmptied = DateTime.Now;
+                EmptyHistory history = new EmptyHistory
+                {
+                    Id = trashBin.EmptyHistory.Count + 1,
+                    TrashBinId = trashBin.Id,
+                    EmptiedAt = trashBin.LastEmptied
+                };
+                trashBin.EmptyHistory.Add(history);
+                return trashBin;
+        }
     }
 }
+
