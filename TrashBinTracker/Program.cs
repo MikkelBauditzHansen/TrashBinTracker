@@ -27,10 +27,13 @@ namespace TrashBinTracker
                      new System.Text.Json.Serialization.JsonStringEnumConverter());
              });
             builder.Services.AddOpenApi();
-            builder.Services.AddSingleton<NotificationRepo>(new NotificationRepo());
             builder.Services.AddSwaggerGen();
+
+            // Register repositories for DI. NotificationRepo now depends on ITrashRepository,
+            // so let the container construct it.
             builder.Services.AddSingleton<ITrashRepository, TrashRepositoryList>();
             builder.Services.AddSingleton<ILocationRepository, LocationRepositoryList>();
+            builder.Services.AddSingleton<INotificationRepo, NotificationRepo>();
 
             // ? TILFØJ CORS
             builder.Services.AddCors(options =>

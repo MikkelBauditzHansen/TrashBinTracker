@@ -9,9 +9,11 @@ namespace TrashBinTracker.Controllers
     public class TrashBinTrackerController : Controller
     {
         private readonly ITrashRepository _trashRepository;
-        public TrashBinTrackerController(ITrashRepository trashRepository)
+        private readonly INotificationRepo _notificationRepo;
+        public TrashBinTrackerController(ITrashRepository trashRepository, INotificationRepo notificationRepo)
         {
             _trashRepository = trashRepository;
+            _notificationRepo = notificationRepo;
         }
         [HttpPost]
         public ActionResult<TrashBin> AddTrashBin([FromBody] TrashBin trashBin)
@@ -51,10 +53,24 @@ namespace TrashBinTracker.Controllers
         public ActionResult<TrashBin> UpdateTrashBin(int id, [FromBody] TrashBin trashBin)
         {
             TrashBin? updatedTrashBin = _trashRepository.Update(id, trashBin);
+
             if (updatedTrashBin == null)
-            {
                 return NotFound();
+
+            if (updatedTrashBin.FillLevel >= 80)
+            {
+                var exists = _notificationRepo.GetAll()
+                    .Any(n => n.TrashCanID == updatedTrashBin.Id);
+
+                if (!exists)
+                {
+                    _notificationRepo.Add(
+                        updatedTrashBin.FillLevel,
+                        updatedTrashBin.Id
+                    );
+                }
             }
+
             return Ok(updatedTrashBin);
         }
         [HttpDelete("{id}")]
