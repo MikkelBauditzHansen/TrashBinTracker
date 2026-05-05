@@ -9,13 +9,13 @@
         public int TrashCanID { set; get; }
 
         public int NotificationId { set; get; }
-
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public Notification(int trashLevel, int trashCanID, int notaficationId)
         {
             TrashLevel = trashLevel;
             TrashCanID = trashCanID;
             NotificationId = notaficationId;
-            NotificationMessage = $"Youre trashlevel is {trashLevel}";
+            NotificationMessage = "";
         }
     }
 }

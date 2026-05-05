@@ -16,9 +16,29 @@ namespace TrashBinTracker.Repo
 
         public Notification Add(int trashLevel, int trashCanID)
         {
-            Notification notification = new Notification(trashLevel, trashCanID, _nextId++);
-            var binName = _trashRepository.GetById(trashCanID)?.Name ?? "Unknown bin";
-            notification.NotificationMessage = $"{binName} trash level is {trashLevel}%";
+            var bin = _trashRepository.GetById(trashCanID);
+            var binName = bin?.Name ?? "Unknown bin";
+
+            string message;
+
+            if (trashLevel >= 80)
+            {
+                message = $"{binName} er {trashLevel}% fuld!";
+            }
+            else if (trashLevel == 0)
+            {
+                message = $"{binName} er blevet tømt";
+            }
+            else
+            {
+                message = $"{binName} er {trashLevel}% fuld";
+            }
+
+            Notification notification = new Notification(trashLevel, trashCanID, _nextId++)
+            {
+                NotificationMessage = message
+            };
+
             _notifications.Add(notification);
             return notification;
         }

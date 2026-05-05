@@ -24,7 +24,7 @@ namespace TrashBinTracker.Model
             Name = "";
             WasteType = WasteType.General;
             FillLevel = 0;
-            LastEmptied = DateTime.Now;
+            LastEmptied = DateTime.UtcNow;
             EmptyHistory = new List<EmptyHistory>();
         }
     }

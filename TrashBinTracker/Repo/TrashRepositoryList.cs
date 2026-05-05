@@ -60,21 +60,22 @@ namespace TrashBinTracker.Repo
         }
         public TrashBin? EmptyTrash(int id)
         {
-                TrashBin? trashBin = GetById(id);
-                if (trashBin == null)
-                {
-                    return null;
-                }
-                trashBin.FillLevel = 0;
-                trashBin.LastEmptied = DateTime.Now;
-                EmptyHistory history = new EmptyHistory
-                {
-                    Id = trashBin.EmptyHistory.Count + 1,
-                    TrashBinId = trashBin.Id,
-                    EmptiedAt = trashBin.LastEmptied
-                };
-                trashBin.EmptyHistory.Add(history);
-                return trashBin;
+            var bin = GetById(id);
+            if (bin == null) return null;
+
+            bin.FillLevel = 0;
+            bin.LastEmptied = DateTime.UtcNow;
+
+            bin.EmptyHistory ??= new List<EmptyHistory>();
+
+            bin.EmptyHistory.Add(new EmptyHistory
+            {
+                Id = bin.EmptyHistory.Count + 1,
+                TrashBinId = bin.Id,
+                EmptiedAt = bin.LastEmptied
+            });
+
+            return bin;
         }
     }
 }

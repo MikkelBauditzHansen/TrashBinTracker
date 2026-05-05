@@ -52,26 +52,21 @@ namespace TrashBinTracker.Controllers
         [HttpPut("{id}")]
         public ActionResult<TrashBin> UpdateTrashBin(int id, [FromBody] TrashBin trashBin)
         {
-            TrashBin? updatedTrashBin = _trashRepository.Update(id, trashBin);
+            TrashBin? updated = _trashRepository.Update(id, trashBin);
 
-            if (updatedTrashBin == null)
+            if (updated == null)
                 return NotFound();
 
-            if (updatedTrashBin.FillLevel >= 80)
+            // 🚨 OVER 80% = NOTIFIKATION
+            if (updated.FillLevel >= 80)
             {
-                var exists = _notificationRepo.GetAll()
-                    .Any(n => n.TrashCanID == updatedTrashBin.Id);
-
-                if (!exists)
-                {
-                    _notificationRepo.Add(
-                        updatedTrashBin.FillLevel,
-                        updatedTrashBin.Id
-                    );
-                }
+                _notificationRepo.Add(
+                    updated.FillLevel,
+                    updated.Id
+                );
             }
 
-            return Ok(updatedTrashBin);
+            return Ok(updated);
         }
         [HttpDelete("{id}")]
         public ActionResult<TrashBin> DeleteTrashBin(int id)
@@ -85,14 +80,20 @@ namespace TrashBinTracker.Controllers
 
         }
         [HttpPut("{id}/empty")]
-        public ActionResult<TrashBin> EmptyTrashBin(int id)
+        public ActionResult<TrashBin> Empty(int id)
         {
-            TrashBin? emptiedTrashBin = _trashRepository.EmptyTrash(id);
-            if (emptiedTrashBin == null)
-            {
+            TrashBin? emptied = _trashRepository.EmptyTrash(id);
+
+            if (emptied == null)
                 return NotFound();
-            }
-            return Ok(emptiedTrashBin);
+
+            // 🧹 TØMNING NOTIFIKATION
+            _notificationRepo.Add(
+                0,
+                emptied.Id
+            );
+
+            return Ok(emptied);
         }
     }
 }
