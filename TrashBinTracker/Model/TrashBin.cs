@@ -14,6 +14,7 @@
         public int LocationId { get; set; }
         public WasteType WasteType { get; set; }
         public int FillLevel { get; set; }
+        public DateTime LastEmptied { get; set; }
 
         public TrashBin()
         {
