@@ -1,7 +1,9 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 using TrashBinTracker.Repo;
+using TrashBinTracker.Data;
 
 
 namespace TrashBinTracker
