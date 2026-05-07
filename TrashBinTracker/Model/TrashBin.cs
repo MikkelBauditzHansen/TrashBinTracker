@@ -14,6 +14,7 @@ namespace TrashBinTracker.Model
         public int Id { get; set; }
         public string? Name { get; set; }
         public int LocationId { get; set; }
+        public string? Location { get; set; }
         public WasteType WasteType { get; set; }
         public int FillLevel { get; set; }
         public DateTime LastEmptied { get; set; }

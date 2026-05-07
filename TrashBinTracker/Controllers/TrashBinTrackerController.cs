@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TrashBinTracker.Model;
 using TrashBinTracker.Repo;
 
@@ -15,6 +16,9 @@ namespace TrashBinTracker.Controllers
             _trashRepository = trashRepository;
             _notificationRepo = notificationRepo;
         }
+
+        //accessible for admin
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public ActionResult<TrashBin> AddTrashBin([FromBody] TrashBin trashBin)
         {
@@ -29,6 +33,9 @@ namespace TrashBinTracker.Controllers
             }
             return CreatedAtAction(nameof(AddTrashBin), new { id = addedTrashbin.Id }, addedTrashbin);
         }
+
+        //accessible for both admin and user
+        [Authorize(Roles = "Admin, User")]
         [HttpGet]
         public ActionResult<IEnumerable<TrashBin>> GetAllTrashBins()
         {
@@ -39,6 +46,9 @@ namespace TrashBinTracker.Controllers
             }
             return Ok(trashBins);
         }
+
+        //accessible for both admin and user
+        [Authorize(Roles = "Admin, User")]
         [HttpGet("{id}")]
         public ActionResult<TrashBin> GetTrashBinById(int id)
         {
@@ -49,6 +59,9 @@ namespace TrashBinTracker.Controllers
             }
             return Ok(trashBin);
         }
+
+        //accessible for admin
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public ActionResult<TrashBin> UpdateTrashBin(int id, [FromBody] TrashBin trashBin)
         {
@@ -68,6 +81,9 @@ namespace TrashBinTracker.Controllers
 
             return Ok(updated);
         }
+
+        //accessible for admin
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public ActionResult<TrashBin> DeleteTrashBin(int id)
         {
@@ -77,7 +93,6 @@ namespace TrashBinTracker.Controllers
                 return NotFound();
             }
             return Ok(deletedTrashBin);
-
         }
         [HttpPut("{id}/empty")]
         public ActionResult<TrashBin> Empty(int id)
