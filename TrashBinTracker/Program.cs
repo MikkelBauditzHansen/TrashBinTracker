@@ -1,6 +1,6 @@
 using TrashBinTracker.Repo;
-
-using TrashBinTracker.Repo;
+using Microsoft.EntityFrameworkCore;
+using TrashBinTracker.Data;
 
 namespace TrashBinTracker
 {
@@ -20,6 +20,9 @@ namespace TrashBinTracker
                                           });
             });
             builder.Services.AddControllers();
+            builder.Services.AddDbContext<TrashDbContext>(options =>
+                        options.UseSqlServer(
+                        builder.Configuration.GetConnectionString("TrashDb")));
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
             {
@@ -31,9 +34,9 @@ namespace TrashBinTracker
 
             // Register repositories for DI. NotificationRepo now depends on ITrashRepository,
             // so let the container construct it.
-            builder.Services.AddSingleton<ITrashRepository, TrashRepositoryList>();
-            builder.Services.AddSingleton<ILocationRepository, LocationRepositoryList>();
-            builder.Services.AddSingleton<INotificationRepo, NotificationRepo>();
+            builder.Services.AddScoped<ITrashRepository, TrashRepositoryDB>();
+            builder.Services.AddScoped<ILocationRepository, LocationRepositoryDB>();
+            builder.Services.AddScoped<INotificationRepo, NotificationRepositoryDB>();
 
             // ? TILFØJ CORS
             builder.Services.AddCors(options =>

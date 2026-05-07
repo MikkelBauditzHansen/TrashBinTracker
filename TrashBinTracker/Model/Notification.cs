@@ -17,5 +17,8 @@
             NotificationId = notaficationId;
             NotificationMessage = "";
         }
+        public Notification()
+        {
+        }
     }
 }

@@ -8,6 +8,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NootficaionTest", "NootficaionTest\NootficaionTest.csproj", "{FD627107-27FD-45B1-ACE3-BA6649C8E206}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationSelenium", "NotificationSelenium\NotificationSelenium.csproj", "{B44C7C5B-2F52-4526-9B70-46AE54ADC856}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrashBinTrackerTests", "TestProject2\TrashBinTrackerTests.csproj", "{131B1F7F-B534-40BC-8CBA-E98B2098E17D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frontend", "Frontend\Frontend.csproj", "{3D1CA380-622E-49C3-A5C4-D1A1CB266649}"
