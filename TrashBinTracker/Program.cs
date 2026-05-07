@@ -24,6 +24,7 @@ namespace TrashBinTracker
                                           });
             });
             builder.Services.AddControllers();
+            builder.Services.AddHttpClient();
             builder.Services.AddDbContext<TrashDbContext>(options =>
                         options.UseSqlServer(
                         builder.Configuration.GetConnectionString("TrashDb")));
@@ -97,9 +98,6 @@ namespace TrashBinTracker
 
             app.UseSwagger();
             app.UseSwaggerUI();
-
-            // ? AKTIVÉR CORS (skal være før Authorization!)
-            app.UseCors("AllowFrontend");
 
 
             // ? Aktiver JWT-AUTHENTICATION
