@@ -22,6 +22,9 @@ namespace TrashBinTracker
                                           });
             });
             builder.Services.AddControllers();
+            builder.Services.AddDbContext<TrashDbContext>(options =>
+                        options.UseSqlServer(
+                        builder.Configuration.GetConnectionString("TrashDb")));
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
             {
@@ -29,10 +32,13 @@ namespace TrashBinTracker
                      new System.Text.Json.Serialization.JsonStringEnumConverter());
              });
             builder.Services.AddOpenApi();
-            builder.Services.AddSingleton<NotificationRepo>(new NotificationRepo());
             builder.Services.AddSwaggerGen();
-            builder.Services.AddSingleton<ITrashRepository, TrashRepositoryList>();
-            builder.Services.AddSingleton<ILocationRepository, LocationRepositoryList>();
+
+            // Register repositories for DI. NotificationRepo now depends on ITrashRepository,
+            // so let the container construct it.
+            builder.Services.AddScoped<ITrashRepository, TrashRepositoryDB>();
+            builder.Services.AddScoped<ILocationRepository, LocationRepositoryDB>();
+            builder.Services.AddScoped<INotificationRepo, NotificationRepositoryDB>();
 
             // ? TILFØJ CORS
             builder.Services.AddCors(options =>

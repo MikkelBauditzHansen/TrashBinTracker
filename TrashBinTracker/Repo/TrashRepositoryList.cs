@@ -13,6 +13,11 @@ namespace TrashBinTracker.Repo
         public TrashBin Add(TrashBin trashBin)
         {
             trashBin.Id = _nextId++;
+
+            if(trashBin.LastEmptied == default)
+            {
+                trashBin.LastEmptied = DateTime.Now;
+            }
             _trashBins.Add(trashBin);
             return trashBin;
         }
@@ -27,11 +32,17 @@ namespace TrashBinTracker.Repo
             {
                 return null;
             }
+            bool wasEmtied = existing.FillLevel > 0 && updatedTrashBin.FillLevel == 100;
             existing.Name = updatedTrashBin.Name;
             existing.LocationId = updatedTrashBin.LocationId;
             existing.WasteType = updatedTrashBin.WasteType;
             existing.FillLevel = updatedTrashBin.FillLevel;
-            return existing;
+
+            if(wasEmtied)
+            {
+                existing.LastEmptied = DateTime.Now;
+            }
+            return existing;    
         }
         public TrashBin? Delete(int id)
         {
@@ -47,5 +58,25 @@ namespace TrashBinTracker.Repo
         {
             return _trashBins.FirstOrDefault(b => b.Id == id);
         }
+        public TrashBin? EmptyTrash(int id)
+        {
+            var bin = GetById(id);
+            if (bin == null) return null;
+
+            bin.FillLevel = 0;
+            bin.LastEmptied = DateTime.UtcNow;
+
+            bin.EmptyHistory ??= new List<EmptyHistory>();
+
+            bin.EmptyHistory.Add(new EmptyHistory
+            {
+                Id = bin.EmptyHistory.Count + 1,
+                TrashBinId = bin.Id,
+                EmptiedAt = bin.LastEmptied
+            });
+
+            return bin;
+        }
     }
 }
+

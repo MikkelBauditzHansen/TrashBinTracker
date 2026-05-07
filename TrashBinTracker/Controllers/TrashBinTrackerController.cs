@@ -10,9 +10,11 @@ namespace TrashBinTracker.Controllers
     public class TrashBinTrackerController : Controller
     {
         private readonly ITrashRepository _trashRepository;
-        public TrashBinTrackerController(ITrashRepository trashRepository)
+        private readonly INotificationRepo _notificationRepo;
+        public TrashBinTrackerController(ITrashRepository trashRepository, INotificationRepo notificationRepo)
         {
             _trashRepository = trashRepository;
+            _notificationRepo = notificationRepo;
         }
 
         //accessible for admin
@@ -63,12 +65,21 @@ namespace TrashBinTracker.Controllers
         [HttpPut("{id}")]
         public ActionResult<TrashBin> UpdateTrashBin(int id, [FromBody] TrashBin trashBin)
         {
-            TrashBin? updatedTrashBin = _trashRepository.Update(id, trashBin);
-            if (updatedTrashBin == null)
-            {
+            TrashBin? updated = _trashRepository.Update(id, trashBin);
+
+            if (updated == null)
                 return NotFound();
+
+            // 🚨 OVER 80% = NOTIFIKATION
+            if (updated.FillLevel >= 80)
+            {
+                _notificationRepo.Add(
+                    updated.FillLevel,
+                    updated.Id
+                );
             }
-            return Ok(updatedTrashBin);
+
+            return Ok(updated);
         }
 
         //accessible for admin
@@ -82,6 +93,22 @@ namespace TrashBinTracker.Controllers
                 return NotFound();
             }
             return Ok(deletedTrashBin);
+        }
+        [HttpPut("{id}/empty")]
+        public ActionResult<TrashBin> Empty(int id)
+        {
+            TrashBin? emptied = _trashRepository.EmptyTrash(id);
+
+            if (emptied == null)
+                return NotFound();
+
+            // 🧹 TØMNING NOTIFIKATION
+            _notificationRepo.Add(
+                0,
+                emptied.Id
+            );
+
+            return Ok(emptied);
         }
     }
 }

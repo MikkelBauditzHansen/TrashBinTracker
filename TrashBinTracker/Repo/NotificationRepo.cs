@@ -6,11 +6,39 @@ namespace TrashBinTracker.Repo
     public class NotificationRepo : INotificationRepo
     {
         private readonly List<Notification> _notifications = new();
+        private readonly ITrashRepository _trashRepository;
         private int _nextId = 1;
+
+        public NotificationRepo(ITrashRepository trashRepository)
+        {
+            _trashRepository = trashRepository;
+        }
 
         public Notification Add(int trashLevel, int trashCanID)
         {
-            Notification notification = new Notification(trashLevel, trashCanID, _nextId++);
+            var bin = _trashRepository.GetById(trashCanID);
+            var binName = bin?.Name ?? "Unknown bin";
+
+            string message;
+
+            if (trashLevel >= 80)
+            {
+                message = $"{binName} er {trashLevel}% fuld!";
+            }
+            else if (trashLevel == 0)
+            {
+                message = $"{binName} er blevet tømt";
+            }
+            else
+            {
+                message = $"{binName} er {trashLevel}% fuld";
+            }
+
+            Notification notification = new Notification(trashLevel, trashCanID, _nextId++)
+            {
+                NotificationMessage = message
+            };
+
             _notifications.Add(notification);
             return notification;
         }
@@ -47,8 +75,8 @@ namespace TrashBinTracker.Repo
 
             notif.TrashLevel = trashLevel;
             notif.TrashCanID = trashBinId;
-            notif.NotificationMessage = $"Your trash level is {trashLevel}%";
-
+            var binName = _trashRepository.GetById(trashBinId)?.Name ?? "Unknown bin";
+            notif.NotificationMessage = $"{binName} trash level is {trashLevel}%";
             return notif;
         }
     }

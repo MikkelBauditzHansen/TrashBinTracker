@@ -1,4 +1,6 @@
-﻿namespace TrashBinTracker.Model
+﻿using Microsoft.VisualBasic;
+
+namespace TrashBinTracker.Model
 {
     public enum WasteType
     {
@@ -15,12 +17,16 @@
         public string? Location { get; set; }
         public WasteType WasteType { get; set; }
         public int FillLevel { get; set; }
+        public DateTime LastEmptied { get; set; }
+        public List<EmptyHistory> EmptyHistory { get; set; }
 
         public TrashBin()
         {
             Name = "";
             WasteType = WasteType.General;
             FillLevel = 0;
+            LastEmptied = DateTime.UtcNow;
+            EmptyHistory = new List<EmptyHistory>();
         }
     }
 
