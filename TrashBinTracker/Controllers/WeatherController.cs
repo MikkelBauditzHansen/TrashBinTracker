@@ -14,12 +14,14 @@ namespace TrashBinTracker.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<object>> GetWeather(
-     [FromQuery] double latitude,
-     [FromQuery] double longitude)
+        public async Task<ActionResult<object>> GetWeather()
         {
             string url =
-                $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current_weather=true";
+                "https://api.open-meteo.com/v1/forecast" +
+                "?latitude=55.6415" +
+                "&longitude=12.0803" +
+                "&hourly=temperature_2m,precipitation,rain,showers,snowfall" +
+                "&forecast_days=1";
 
             object? weatherData =
                 await _httpClient.GetFromJsonAsync<object>(url);
