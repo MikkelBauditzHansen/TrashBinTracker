@@ -42,6 +42,7 @@ namespace TrashBinTracker
             builder.Services.AddScoped<ITrashRepository, TrashRepositoryDB>();
             builder.Services.AddScoped<ILocationRepository, LocationRepositoryDB>();
             builder.Services.AddScoped<INotificationRepo, NotificationRepositoryDB>();
+            builder.Services.AddScoped<IEmptyHistoryRepo, EmptyHistoryRepoDB>();
 
             // ? TILFØJ CORS
             builder.Services.AddCors(options =>
