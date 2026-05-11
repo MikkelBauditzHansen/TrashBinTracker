@@ -13,6 +13,7 @@ namespace NootficaionTest
 {
     public class NotificationTest
     {
+        private readonly ITrashRepository _trashRepository;
 
         [Theory]
         [InlineData(-1)]
@@ -21,7 +22,7 @@ namespace NootficaionTest
         [InlineData(1000)]
         public void AddTest(int newID)
         {
-           NotificationRepo repo = new NotificationRepo();
+           NotificationRepo repo = new NotificationRepo(_trashRepository);
 
 
            Notification notification =  repo.Add(2,2);
@@ -34,7 +35,7 @@ namespace NootficaionTest
         [Fact]
         public void GetAllTest()
         {
-            NotificationRepo repo = new NotificationRepo();
+            NotificationRepo repo = new NotificationRepo(_trashRepository);
 
 
             List<Notification> notifications = repo.GetAll();
@@ -47,7 +48,7 @@ namespace NootficaionTest
         [Fact]
         public void GetTest()
         {
-            NotificationRepo repo = new NotificationRepo();
+            NotificationRepo repo = new NotificationRepo(_trashRepository);
 
             Notification notification = repo.Get(2);
 
@@ -58,7 +59,7 @@ namespace NootficaionTest
         [Fact]
         public void DeleteTest()
         {
-            NotificationRepo repo = new NotificationRepo();
+            NotificationRepo repo = new NotificationRepo(_trashRepository);
 
 
             Notification notification = repo.Delete(2);
@@ -70,7 +71,7 @@ namespace NootficaionTest
         [Fact]
         public void UpdateTest()
         {
-            NotificationRepo repo = new NotificationRepo();
+            NotificationRepo repo = new NotificationRepo(_trashRepository);
 
             Notification notification = repo.Update(2,2,2);
 
