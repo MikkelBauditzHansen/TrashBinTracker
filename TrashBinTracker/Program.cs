@@ -1,9 +1,10 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
-using TrashBinTracker.Repo;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using TrashBinTracker.Data;
+using TrashBinTracker.Repo;
+using TrashBinTracker.Service;
 
 
 namespace TrashBinTracker
@@ -25,6 +26,7 @@ namespace TrashBinTracker
             });
             builder.Services.AddControllers();
             builder.Services.AddHttpClient();
+            builder.Services.AddHttpClient<TelegramService>();
             builder.Services.AddDbContext<TrashDbContext>(options =>
                         options.UseSqlServer(
                         builder.Configuration.GetConnectionString("TrashDb")));
