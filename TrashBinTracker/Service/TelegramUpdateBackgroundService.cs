@@ -9,6 +9,7 @@ namespace TrashBinTracker.Service
         private readonly HttpClient _httpClient;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly TelegramService _telegramService;
+        private readonly ILogger<TelegramUpdateBackgroundService> _logger;
 
         private readonly string _botToken =
             "8627431919:AAEVa4Fq78A0UpgzCtNOSvT4XGMw6ht_Y7U";
@@ -21,72 +22,133 @@ namespace TrashBinTracker.Service
         public TelegramUpdateBackgroundService(
             HttpClient httpClient,
             IServiceScopeFactory scopeFactory,
-            TelegramService telegramService)
+            TelegramService telegramService,
+            ILogger<TelegramUpdateBackgroundService> logger)
         {
             _httpClient = httpClient;
             _scopeFactory = scopeFactory;
             _telegramService = telegramService;
+            _logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                await CheckTelegramCommands();
+                await CheckTelegramCommands(stoppingToken);
 
-                await Task.Delay(3000, stoppingToken);
+                try
+                {
+                    await Task.Delay(3000, stoppingToken);
+                }
+                catch (TaskCanceledException)
+                {
+                    break;
+                }
             }
         }
 
-        private async Task CheckTelegramCommands()
+        private async Task CheckTelegramCommands(CancellationToken stoppingToken)
         {
-            string url =
-                $"https://api.telegram.org/bot{_botToken}/getUpdates?offset={_lastUpdateId + 1}";
-
-            string json =
-                await _httpClient.GetStringAsync(url);
-
-            JsonDocument document =
-                JsonDocument.Parse(json);
-
-            JsonElement result =
-                document.RootElement.GetProperty("result");
-
-            foreach (JsonElement update in result.EnumerateArray())
+            try
             {
-                int updateId =
-                    update.GetProperty("update_id").GetInt32();
+                string url =
+                    $"https://api.telegram.org/bot{_botToken}/getUpdates?offset={_lastUpdateId + 1}";
 
-                _lastUpdateId = updateId;
+                using HttpResponseMessage response =
+                    await _httpClient.GetAsync(url, stoppingToken);
 
-                if (!update.TryGetProperty("message", out JsonElement message))
+                if (!response.IsSuccessStatusCode)
                 {
-                    continue;
+                    _logger.LogWarning(
+                        "Telegram getUpdates failed with status {StatusCode}",
+                        response.StatusCode);
+
+                    return;
                 }
 
-                string text =
-                    message.GetProperty("text").GetString();
+                string json =
+                    await response.Content.ReadAsStringAsync(stoppingToken);
 
-                JsonElement chat =
-                    message.GetProperty("chat");
+                using JsonDocument document =
+                    JsonDocument.Parse(json);
 
-                string chatId =
-                    chat.GetProperty("id").GetInt64().ToString();
-
-                if (chatId != _allowedChatId)
+                if (
+                    !document.RootElement.TryGetProperty("ok", out JsonElement okElement) ||
+                    okElement.ValueKind != JsonValueKind.True ||
+                    !okElement.GetBoolean() ||
+                    !document.RootElement.TryGetProperty("result", out JsonElement result) ||
+                    result.ValueKind != JsonValueKind.Array
+                )
                 {
-                    continue;
+                    _logger.LogWarning("Telegram getUpdates returned an unexpected response.");
+
+                    return;
                 }
 
-                if (text == "/status")
+                foreach (JsonElement update in result.EnumerateArray())
                 {
-                    await SendStatus();
-                }
+                    if (
+                        !update.TryGetProperty("update_id", out JsonElement updateIdElement) ||
+                        !updateIdElement.TryGetInt32(out int updateId)
+                    )
+                    {
+                        continue;
+                    }
 
-                if (text == "/tømning" || text == "/tomning")
-                {
-                    await SendLastEmpty();
+                    _lastUpdateId = updateId;
+
+                    if (!update.TryGetProperty("message", out JsonElement message))
+                    {
+                        continue;
+                    }
+
+                    if (!message.TryGetProperty("text", out JsonElement textElement))
+                    {
+                        continue;
+                    }
+
+                    string? text = textElement.GetString();
+
+                    if (string.IsNullOrWhiteSpace(text))
+                    {
+                        continue;
+                    }
+
+                    if (!message.TryGetProperty("chat", out JsonElement chat))
+                    {
+                        continue;
+                    }
+
+                    if (!chat.TryGetProperty("id", out JsonElement chatIdElement))
+                    {
+                        continue;
+                    }
+
+                    string chatId =
+                        chatIdElement.GetInt64().ToString();
+
+                    if (chatId != _allowedChatId)
+                    {
+                        continue;
+                    }
+
+                    if (text == "/status")
+                    {
+                        await SendStatus();
+                    }
+                    else if (text == "/tømning" || text == "/tomning")
+                    {
+                        await SendLastEmpty();
+                    }
                 }
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Telegram command polling failed.");
             }
         }
 

@@ -93,5 +93,21 @@ namespace TrashBinTracker.Controllers
 
             return Ok(message);
         }
+        [HttpPost("temperature-test")]
+        public async Task<IActionResult> TemperatureTest([FromBody] TemperatureTestDto dto)
+        {
+            string message =
+                $"Temperatur-advarsel: {dto.BinName} er {dto.FillLevel}% fuld, og temperaturen er {dto.Temperature}°C.";
+
+            await _telegramService.SendMessage(message);
+
+            return Ok(message);
+        }
+        public class TemperatureTestDto
+        {
+            public string BinName { get; set; }
+            public int FillLevel { get; set; }
+            public double Temperature { get; set; }
+        }
     }
 }

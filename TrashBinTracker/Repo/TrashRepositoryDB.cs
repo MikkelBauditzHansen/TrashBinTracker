@@ -11,13 +11,16 @@ namespace TrashBinTracker.Repo
 
         private readonly TelegramService _telegramService;
 
+        private readonly ILogger<TrashRepositoryDB> _logger;
+
         public TrashRepositoryDB(
             TrashDbContext context,
-            TelegramService telegramService)
+            TelegramService telegramService,
+            ILogger<TrashRepositoryDB> logger)
         {
             _context = context;
-
             _telegramService = telegramService;
+            _logger = logger;
         }
 
         public TrashBin Add(TrashBin trashBin)
@@ -71,30 +74,22 @@ namespace TrashBinTracker.Repo
 
             _context.SaveChanges();
 
-            if (
-                 existing.WasteType == WasteType.Organic &&
-                 existing.FillLevel >= 50
- )
+            bool useTemperatureWarningRule =
+                ShouldUseTemperatureWarningRule(existing);
+
+            if (!useTemperatureWarningRule && existing.FillLevel >= 95)
             {
-                _telegramService.SendTemperatureWarning(
-                    existing.Name,
-                    existing.FillLevel,
-                    22
-                ).Wait();
+                SendTelegramNotification(
+                    () => _telegramService.SendFullWarning(
+                        existing.Name ?? "Ukendt skraldespand",
+                        existing.FillLevel));
             }
-            else if (existing.FillLevel >= 95)
+            else if (!useTemperatureWarningRule && existing.FillLevel >= 80)
             {
-                _telegramService.SendFullWarning(
-                    existing.Name,
-                    existing.FillLevel
-                ).Wait();
-            }
-            else if (existing.FillLevel >= 80)
-            {
-                _telegramService.SendFillWarning(
-                    existing.Name,
-                    existing.FillLevel
-                ).Wait();
+                SendTelegramNotification(
+                    () => _telegramService.SendFillWarning(
+                        existing.Name ?? "Ukendt skraldespand",
+                        existing.FillLevel));
             }
 
             if (
@@ -102,9 +97,9 @@ namespace TrashBinTracker.Repo
                 DateTime.UtcNow.AddHours(-48)
             )
             {
-                _telegramService.SendTimeWarning(
-                    existing.Name
-                ).Wait();
+                SendTelegramNotification(
+                    () => _telegramService.SendTimeWarning(
+                        existing.Name ?? "Ukendt skraldespand"));
             }
 
             return existing;
@@ -160,12 +155,42 @@ namespace TrashBinTracker.Repo
 
             if (previousFillLevel >= 10)
             {
-                _telegramService.SendMessage(
-                    $"{bin.Name} er blevet tømt. Den var: {previousFillLevel}% fyldt."
-                ).Wait();
+                SendTelegramNotification(
+                    () => _telegramService.SendMessage(
+                        $"{bin.Name ?? "Ukendt skraldespand"} er blevet tømt. Den var: {previousFillLevel}% fyldt."));
             }
 
             return bin;
+        }
+
+        private bool ShouldUseTemperatureWarningRule(TrashBin bin)
+        {
+            if (
+                bin.WasteType != WasteType.Organic ||
+                bin.FillLevel < 50
+            )
+            {
+                return false;
+            }
+
+            Location? location =
+                _context.Locations.Find(bin.LocationId);
+
+            return location != null && !location.IsIndoor;
+        }
+
+        private void SendTelegramNotification(Func<Task> sendMessage)
+        {
+            try
+            {
+                sendMessage()
+                    .GetAwaiter()
+                    .GetResult();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Could not send Telegram notification.");
+            }
         }
     }
 }
