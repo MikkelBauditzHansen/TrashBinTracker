@@ -137,6 +137,9 @@ namespace TrashBinTracker.Repo
                 return null;
             }
 
+            int previousFillLevel =
+                bin.FillLevel;
+
             bin.FillLevel = 0;
 
             bin.LastEmptied =
@@ -155,9 +158,12 @@ namespace TrashBinTracker.Repo
 
             _context.SaveChanges();
 
-            _telegramService.SendMessage(
-                $"{bin.Name} er blevet tømt."
-            ).Wait();
+            if (previousFillLevel >= 10)
+            {
+                _telegramService.SendMessage(
+                    $"{bin.Name} er blevet tømt. Den var: {previousFillLevel}% fyldt."
+                ).Wait();
+            }
 
             return bin;
         }

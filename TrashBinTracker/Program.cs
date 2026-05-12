@@ -25,6 +25,11 @@ namespace TrashBinTracker
                                           });
             });
             builder.Services.AddControllers();
+            builder.Services.AddHttpClient<TelegramService>();
+
+            builder.Services.AddHttpClient<TelegramUpdateBackgroundService>();
+
+            builder.Services.AddHostedService<TelegramUpdateBackgroundService>();
             builder.Services.AddHttpClient();
             builder.Services.AddHttpClient<TelegramService>();
             builder.Services.AddDbContext<TrashDbContext>(options =>
