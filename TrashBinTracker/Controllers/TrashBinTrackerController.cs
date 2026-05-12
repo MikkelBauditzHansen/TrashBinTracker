@@ -44,6 +44,31 @@ namespace TrashBinTracker.Controllers
             {
                 return Ok(new List<TrashBin>());
             }
+            //  NOTIFIKATION FOR TRASH BINS OVER 48 timer
+            foreach (var bin in trashBins)
+            {
+                var hours =
+                    (DateTime.UtcNow - bin.LastEmptied)
+                    .TotalHours;
+
+                if (hours >= 48)
+                {
+                    string message =
+                        $"{bin.Name} har ikke været tømt i over 48 timer!";
+
+                    bool alreadyExists =
+                        _notificationRepo.Exists(message);
+
+                    if (!alreadyExists)
+                    {
+                        _notificationRepo.Add(
+                            bin.FillLevel,
+                            bin.Id,
+                            message
+                        );
+                    }
+                }
+            }
             return Ok(trashBins);
         }
 

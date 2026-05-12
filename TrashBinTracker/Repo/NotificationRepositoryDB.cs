@@ -16,14 +16,17 @@ namespace TrashBinTracker.Repo
             _trashRepository = trashRepository;
         }
 
-        public Notification Add(int trashLevel, int trashCanID)
+        public Notification Add(int trashLevel, int trashCanID, string? customMessage = null)
         {
             var bin = _trashRepository.GetById(trashCanID);
 
             string message =
-                trashLevel >= 80
+            customMessage ??
+          (
+              trashLevel >= 80
                 ? $"{bin?.Name} er {trashLevel}% fuld!"
-                : $"{bin?.Name} er blevet tømt";
+              : $"{bin?.Name} er blevet tømt"
+          );
 
             Notification notification = new Notification
             {
@@ -82,6 +85,12 @@ namespace TrashBinTracker.Repo
             _context.SaveChanges();
 
             return notif;
+        }
+        //? TILFØJ EN METODE DER CHECKER OM EN NOTIFICATION MED SAMME MESSAGE ALLEREDE FINDES, FOR AT UNDGÅ DUPLIKATER
+        public bool Exists(string message)
+        {
+            return _context.Notifications
+                .Any(n => n.NotificationMessage == message);
         }
     }
 }

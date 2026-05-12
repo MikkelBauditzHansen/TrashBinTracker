@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using TrashBinTracker.Model;
 
 namespace TrashBinTracker.Repo
@@ -14,25 +15,20 @@ namespace TrashBinTracker.Repo
             _trashRepository = trashRepository;
         }
 
-        public Notification Add(int trashLevel, int trashCanID)
+        public Notification Add(int trashLevel, int trashCanID, string? customMessage = null)
         {
             var bin = _trashRepository.GetById(trashCanID);
             var binName = bin?.Name ?? "Unknown bin";
 
-            string message;
-
-            if (trashLevel >= 80)
-            {
-                message = $"{binName} er {trashLevel}% fuld!";
-            }
-            else if (trashLevel == 0)
-            {
-                message = $"{binName} er blevet tømt";
-            }
-            else
-            {
-                message = $"{binName} er {trashLevel}% fuld";
-            }
+            string message =
+             customMessage ??
+             (
+                   trashLevel >= 80
+                   ? $"{binName} er {trashLevel}% fuld!"
+                   : trashLevel == 0
+                   ? $"{binName} er blevet tømt"
+                   : $"{binName} er {trashLevel}% fuld"
+             );
 
             Notification notification = new Notification(trashLevel, trashCanID, _nextId++)
             {
@@ -78,6 +74,11 @@ namespace TrashBinTracker.Repo
             var binName = _trashRepository.GetById(trashBinId)?.Name ?? "Unknown bin";
             notif.NotificationMessage = $"{binName} trash level is {trashLevel}%";
             return notif;
+        }
+        public bool Exists(string message)
+        {
+            return _notifications
+                .Any(n => n.NotificationMessage == message);
         }
     }
 }
