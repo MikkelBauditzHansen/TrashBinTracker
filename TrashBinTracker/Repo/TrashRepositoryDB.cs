@@ -71,7 +71,18 @@ namespace TrashBinTracker.Repo
 
             _context.SaveChanges();
 
-            if (existing.FillLevel >= 95)
+            if (
+                 existing.WasteType == WasteType.Organic &&
+                 existing.FillLevel >= 50
+ )
+            {
+                _telegramService.SendTemperatureWarning(
+                    existing.Name,
+                    existing.FillLevel,
+                    22
+                ).Wait();
+            }
+            else if (existing.FillLevel >= 95)
             {
                 _telegramService.SendFullWarning(
                     existing.Name,
@@ -83,19 +94,6 @@ namespace TrashBinTracker.Repo
                 _telegramService.SendFillWarning(
                     existing.Name,
                     existing.FillLevel
-                ).Wait();
-            }
-
-            if (
-                existing.WasteType == WasteType.Organic &&
-                existing.FillLevel >= 50
-            
-            )
-            {
-                _telegramService.SendTemperatureWarning(
-                    existing.Name,
-                    existing.FillLevel,
-                    22
                 ).Wait();
             }
 
@@ -156,6 +154,10 @@ namespace TrashBinTracker.Repo
             _context.EmptyHistory.Add(history);
 
             _context.SaveChanges();
+
+            _telegramService.SendMessage(
+                $"{bin.Name} er blevet tømt."
+            ).Wait();
 
             return bin;
         }
