@@ -30,6 +30,8 @@ namespace TrashBinTracker.Repo
                 trashBin.LastEmptied = DateTime.UtcNow;
             }
 
+            trashBin.IsActiveSensorBin = false;
+
             _context.TrashBins.Add(trashBin);
 
             _context.SaveChanges();
@@ -94,7 +96,8 @@ namespace TrashBinTracker.Repo
 
             if (
                 existing.LastEmptied <
-                DateTime.UtcNow.AddHours(-48)
+                DateTime.UtcNow.AddHours(-48) &&
+                Is48HourFillLevel(existing.FillLevel)
             )
             {
                 SendTelegramNotification(
@@ -162,6 +165,60 @@ namespace TrashBinTracker.Repo
 
             return bin;
         }
+        public TrashBin? SetActiveSensorBin(int id)
+        {
+            TrashBin? selectedBin =
+                GetById(id);
+
+            if (selectedBin == null)
+            {
+                return null;
+            }
+
+            IEnumerable<TrashBin> allBins =
+                _context.TrashBins.ToList();
+
+            foreach (TrashBin bin in allBins)
+            {
+                bin.IsActiveSensorBin = false;
+            }
+
+            selectedBin.IsActiveSensorBin = true;
+
+            _context.SaveChanges();
+
+            return selectedBin;
+        }
+
+        public TrashBin? GetActiveSensorBin()
+        {
+            return _context.TrashBins
+                .Include(t => t.EmptyHistory)
+                .FirstOrDefault(t => t.IsActiveSensorBin);
+        }
+
+        public TrashBin? UpdateActiveSensorFillLevel(int fillLevel)
+        {
+            TrashBin? activeBin =
+                GetActiveSensorBin();
+
+            if (activeBin == null)
+            {
+                return null;
+            }
+
+            TrashBin updatedBin =
+                new TrashBin
+                {
+                    Name = activeBin.Name,
+                    LocationId = activeBin.LocationId,
+                    WasteType = activeBin.WasteType,
+                    FillLevel = fillLevel,
+                    LastEmptied = activeBin.LastEmptied
+                };
+
+            return Update(activeBin.Id, updatedBin);
+        }
 
         private bool ShouldUseTemperatureWarningRule(TrashBin bin)
         {
@@ -177,6 +234,11 @@ namespace TrashBinTracker.Repo
                 _context.Locations.Find(bin.LocationId);
 
             return location != null && !location.IsIndoor;
+        }
+
+        private static bool Is48HourFillLevel(int fillLevel)
+        {
+            return fillLevel == 80;
         }
 
         private void SendTelegramNotification(Func<Task> sendMessage)

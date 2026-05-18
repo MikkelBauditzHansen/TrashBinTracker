@@ -44,30 +44,9 @@ namespace TrashBinTracker.Controllers
             {
                 return Ok(new List<TrashBin>());
             }
-            //  NOTIFIKATION FOR TRASH BINS OVER 48 timer
             foreach (var bin in trashBins)
             {
-                var hours =
-                    (DateTime.UtcNow - bin.LastEmptied)
-                    .TotalHours;
-
-                if (hours >= 48)
-                {
-                    string message =
-                        $"{bin.Name} har ikke været tømt i over 48 timer!";
-
-                    bool alreadyExists =
-                        _notificationRepo.Exists(message);
-
-                    if (!alreadyExists)
-                    {
-                        _notificationRepo.Add(
-                            bin.FillLevel,
-                            bin.Id,
-                            message
-                        );
-                    }
-                }
+                Add48HourNotificationIfNeeded(bin);
             }
             return Ok(trashBins);
         }
@@ -104,6 +83,8 @@ namespace TrashBinTracker.Controllers
                 );
             }
 
+            Add48HourNotificationIfNeeded(updated);
+
             return Ok(updated);
         }
 
@@ -135,5 +116,109 @@ namespace TrashBinTracker.Controllers
 
             return Ok(emptied);
         }
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}/active-sensor")]
+        public ActionResult<TrashBin> SetActiveSensorBin(int id)
+        {
+            TrashBin? updatedBin =
+                _trashRepository.SetActiveSensorBin(id);
+
+            if (updatedBin == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(updatedBin);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("active-sensor")]
+        public ActionResult<TrashBin> GetActiveSensorBin()
+        {
+            TrashBin? activeBin =
+                _trashRepository.GetActiveSensorBin();
+
+            if (activeBin == null)
+            {
+                return NotFound("No active sensor bin selected.");
+            }
+
+            return Ok(activeBin);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("active-sensor/live-data")]
+        public ActionResult<TrashBin> UpdateActiveSensorLiveData(
+            [FromBody] SensorLiveDataDto sensorData)
+        {
+            if (sensorData == null)
+            {
+                return BadRequest("Sensor data is required.");
+            }
+
+            if (sensorData.FillLevel < 0 || sensorData.FillLevel > 100)
+            {
+                return BadRequest("FillLevel must be between 0 and 100.");
+            }
+
+            TrashBin? updated =
+                _trashRepository.UpdateActiveSensorFillLevel(sensorData.FillLevel);
+
+            if (updated == null)
+            {
+                return NotFound("No active sensor bin selected.");
+            }
+
+            if (updated.FillLevel >= 80)
+            {
+                _notificationRepo.Add(
+                    updated.FillLevel,
+                    updated.Id
+                );
+            }
+
+            Add48HourNotificationIfNeeded(updated);
+
+            return Ok(updated);
+        }
+
+        private void Add48HourNotificationIfNeeded(TrashBin bin)
+        {
+            double hoursSinceLastEmptied =
+                (DateTime.UtcNow - bin.LastEmptied)
+                .TotalHours;
+
+            if (
+                hoursSinceLastEmptied < 48 ||
+                !Is48HourFillLevel(bin.FillLevel)
+            )
+            {
+                return;
+            }
+
+            string message =
+                $"{bin.Name} har ikke været tømt i over 48 timer og er {bin.FillLevel}% fuld!";
+
+            if (_notificationRepo.Exists(message))
+            {
+                return;
+            }
+
+            _notificationRepo.Add(
+                bin.FillLevel,
+                bin.Id,
+                message
+            );
+        }
+
+        private static bool Is48HourFillLevel(int fillLevel)
+        {
+            return fillLevel == 80;
+        }
+    }
+
+    public class SensorLiveDataDto
+    {
+        public int FillLevel { get; set; }
     }
 }

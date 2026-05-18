@@ -15,14 +15,24 @@ namespace TrashBinTracker
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            string[] allowedCorsOrigins =
+            {
+                "http://127.0.0.1:5500",
+                "http://localhost:5500",
+                "https://shstarthtml-drfseveaedgbfeac.swedencentral-01.azurewebsites.net"
+            };
+
             // Add services to the container.
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy(name: "AllowAll",
-                                          policy =>
-                                          {
-                                              policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-                                          });
+                options.AddPolicy("AllowFrontend",
+                    policy =>
+                    {
+                        policy
+                            .WithOrigins(allowedCorsOrigins)
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
             });
             builder.Services.AddControllers();
 
@@ -51,19 +61,6 @@ namespace TrashBinTracker
             builder.Services.AddScoped<IEmptyHistoryRepo, EmptyHistoryRepoDB>();
 
             // ? TILFØJ CORS
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("AllowFrontend",
-                    policy =>
-                    {
-                        policy.WithOrigins("http://127.0.0.1:5500")
-                              .AllowAnyHeader()
-                              .AllowAnyMethod();
-                    });
-            });
-
-
-
             //JWT Authentication
 
             var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -95,12 +92,36 @@ namespace TrashBinTracker
 
             var app = builder.Build();
 
+            try
+            {
+                using IServiceScope scope = app.Services.CreateScope();
+
+                TrashDbContext dbContext =
+                    scope.ServiceProvider.GetRequiredService<TrashDbContext>();
+
+                dbContext.Database.ExecuteSqlRaw(
+                    """
+                    IF COL_LENGTH('TrashBins', 'IsActiveSensorBin') IS NULL
+                    BEGIN
+                        ALTER TABLE TrashBins
+                        ADD IsActiveSensorBin bit NOT NULL
+                            CONSTRAINT DF_TrashBins_IsActiveSensorBin DEFAULT 0;
+                    END;
+                    """);
+            }
+            catch (Exception ex)
+            {
+                app.Logger.LogWarning(
+                    ex,
+                    "Could not ensure IsActiveSensorBin column exists.");
+            }
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
             }
-            app.UseCors("AllowAll");
+            app.UseCors("AllowFrontend");
             app.UseHttpsRedirection();
 
             app.UseSwagger();

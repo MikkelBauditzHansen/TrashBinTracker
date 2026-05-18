@@ -10,5 +10,8 @@ namespace TrashBinTracker.Repo
         TrashBin? Delete(int id);
         TrashBin? GetById(int id);
         TrashBin? EmptyTrash(int id);
+        TrashBin? SetActiveSensorBin(int id);
+        TrashBin? GetActiveSensorBin();
+        TrashBin? UpdateActiveSensorFillLevel(int fillLevel);
     }
 }

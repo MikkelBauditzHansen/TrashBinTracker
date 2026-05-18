@@ -20,6 +20,8 @@ namespace TrashBinTracker.Model
         public DateTime LastEmptied { get; set; }
         public List<EmptyHistory> EmptyHistory { get; set; }
 
+        public bool IsActiveSensorBin { get; set; }
+
         public TrashBin()
         {
             Name = "";
