@@ -69,9 +69,7 @@ namespace TrashBinTracker.Repo
                 ? existing.LocationId
                 : updatedTrashBin.LocationId;
 
-            existing.WasteType = (updatedTrashBin.WasteType == WasteType.General && existing.WasteType != WasteType.General)
-    ? existing.WasteType
-    : updatedTrashBin.WasteType;
+            existing.WasteType = updatedTrashBin.WasteType;
 
             existing.FillLevel = updatedTrashBin.FillLevel;
 
