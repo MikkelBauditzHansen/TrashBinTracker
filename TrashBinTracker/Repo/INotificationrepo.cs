@@ -10,5 +10,12 @@ namespace TrashBinTracker.Repo
         List<Notification> GetAll();
         Notification Update(int trashLevel, int trashBinId, int id);
         bool Exists(string message);
+        bool ToggleBinFullNotifications();
+
+        bool ToggleTelegram();
+
+        bool GetBinFullStatus();
+
+        bool GetTelegramStatus();
     }
 }

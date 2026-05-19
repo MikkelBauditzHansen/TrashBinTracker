@@ -81,5 +81,42 @@ namespace TrashBinTracker.Controllers
 
             return Ok(deleted);
         }
+        // PUT: api/notification/toggle-binfull
+        [HttpPut("toggle-binfull")]
+        public ActionResult ToggleBinFull()
+        {
+            bool status =
+                _repo.ToggleBinFullNotifications();
+                
+            return Ok(status);
+        }
+
+        // PUT: api/notification/toggle-telegram
+        [HttpPut("toggle-telegram")]
+        public ActionResult ToggleTelegram()
+        {
+            bool status =
+                _repo.ToggleTelegram();
+
+            return Ok(status);
+        }
+
+        // GET: api/notification/binfull-status
+        [HttpGet("binfull-status")]
+        public ActionResult GetBinFullStatus()
+        {
+            return Ok(
+                _repo.GetBinFullStatus()
+            );
+        }
+
+        // GET: api/notification/telegram-status
+        [HttpGet("telegram-status")]
+        public ActionResult GetTelegramStatus()
+        {
+            return Ok(
+                _repo.GetTelegramStatus()
+            );
+        }
     }
 }
