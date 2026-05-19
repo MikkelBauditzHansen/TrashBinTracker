@@ -206,17 +206,14 @@ namespace TrashBinTracker.Repo
                 return null;
             }
 
-            TrashBin updatedBin =
-                new TrashBin
-                {
-                    Name = activeBin.Name,
-                    LocationId = activeBin.LocationId,
-                    WasteType = activeBin.WasteType,
-                    FillLevel = fillLevel,
-                    LastEmptied = activeBin.LastEmptied
-                };
+            activeBin.FillLevel = fillLevel;
 
-            return Update(activeBin.Id, updatedBin);
+            // NYT:
+            activeBin.LastSensorReading = DateTime.UtcNow;
+
+            _context.SaveChanges();
+
+            return activeBin;
         }
 
         private bool ShouldUseTemperatureWarningRule(TrashBin bin)

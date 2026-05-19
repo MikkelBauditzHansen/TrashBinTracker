@@ -21,6 +21,7 @@ namespace TrashBinTracker.Model
         public List<EmptyHistory> EmptyHistory { get; set; }
 
         public bool IsActiveSensorBin { get; set; }
+        public DateTime LastSensorReading { get; set; } = DateTime.UtcNow;
 
         public TrashBin()
         {
