@@ -58,21 +58,22 @@ namespace TrashBinTracker.Repo
             TrashBin? existing = GetById(id);
 
             if (existing == null)
-            {
                 return null;
-            }
 
-            existing.Name =
-                updatedTrashBin.Name;
+            // Bevar eksisterende værdier hvis det nye er tomt
+            existing.Name = string.IsNullOrWhiteSpace(updatedTrashBin.Name)
+                ? existing.Name
+                : updatedTrashBin.Name;
 
-            existing.LocationId =
-                updatedTrashBin.LocationId;
+            existing.LocationId = updatedTrashBin.LocationId == 0
+                ? existing.LocationId
+                : updatedTrashBin.LocationId;
 
-            existing.WasteType =
-                updatedTrashBin.WasteType;
+            existing.WasteType = updatedTrashBin.WasteType == default
+                ? existing.WasteType
+                : updatedTrashBin.WasteType;
 
-            existing.FillLevel =
-                updatedTrashBin.FillLevel;
+            existing.FillLevel = updatedTrashBin.FillLevel;
 
             _context.SaveChanges();
 

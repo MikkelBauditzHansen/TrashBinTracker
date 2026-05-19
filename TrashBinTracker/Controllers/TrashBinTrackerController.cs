@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TrashBinTracker.Model;
 using TrashBinTracker.Repo;
@@ -215,10 +216,22 @@ namespace TrashBinTracker.Controllers
         {
             return fillLevel == 80;
         }
-    }
 
-    public class SensorLiveDataDto
-    {
-        public int FillLevel { get; set; }
+        [HttpGet("stream")]
+        public async Task StreamUpdates(CancellationToken ct)
+        {
+            Response.Headers["Content-Type"] = "text/event-stream";
+            while (!ct.IsCancellationRequested)
+            {
+                var bins = _trashRepository.GetAll();
+                var json = JsonSerializer.Serialize(bins);
+                await Response.WriteAsync($"data: {json}\n\n", ct);
+                await Task.Delay(5000, ct);
+            }
+        }
+        public class SensorLiveDataDto
+        {
+            public int FillLevel { get; set; }
+        }
     }
 }

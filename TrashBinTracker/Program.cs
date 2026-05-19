@@ -34,7 +34,7 @@ namespace TrashBinTracker
                             .AllowAnyMethod();
                     });
             });
-            builder.Services.AddControllers();
+            //builder.Services.AddControllers();
 
             builder.Services.AddHttpClient();
             builder.Services.AddHttpClient<TelegramService>();
