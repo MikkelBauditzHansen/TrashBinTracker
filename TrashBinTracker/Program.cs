@@ -121,9 +121,9 @@ namespace TrashBinTracker
             {
                 app.MapOpenApi();
             }
-            app.UseCors("AllowFrontend");
+            
             app.UseHttpsRedirection();
-
+            app.UseCors("AllowFrontend");
             app.UseSwagger();
             app.UseSwaggerUI();
 
